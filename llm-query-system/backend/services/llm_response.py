@@ -1,4 +1,4 @@
-def get_llm_response(prompt: str) -> str:
+def generate_answer(prompt: str) -> str:
     """
     Simulates getting a response from an LLM.
     Replace this function with a real API call to OpenAI, Azure, etc.
