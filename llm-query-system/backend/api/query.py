@@ -4,8 +4,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 
-from backend.services.embedding_search import search_similar_chunks
-from backend.services.llm_response import generate_answer
+from services.embedding_search import search_similar_chunks
+from services.llm_response import generate_answer
 
 router = APIRouter()
 
