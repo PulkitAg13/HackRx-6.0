@@ -9,7 +9,7 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 def embed_texts(texts: list[str]) -> np.ndarray:
     return model.encode(texts)
 
-def search_similar(query: str, documents: list[str], top_k: int = 5) -> list[tuple[str, float]]:
+def search_similar_chunks(query: str, documents: list[str], top_k: int = 5) -> list[tuple[str, float]]:
     doc_embeddings = embed_texts(documents)
     query_embedding = embed_texts([query])[0].reshape(1, -1)
 
