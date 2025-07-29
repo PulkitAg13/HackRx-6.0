@@ -6,11 +6,11 @@ from typing import List
 import os
 import tempfile
 
-from backend.doc_processor.pdf_extractor import extract_text_from_pdf
-from backend.doc_processor.docx_extractor import extract_text_from_docx
-from backend.doc_processor.email_extractor import extract_text_from_email
-from backend.doc_processor.chunker import chunk_text
-from backend.services.embedding_search import embed_and_store_chunks
+from doc_processor.pdf_extractor import extract_text_from_pdf
+from doc_processor.docx_extractor import extract_text_from_docx
+from doc_processor.email_extractor import extract_text_from_email
+from doc_processor.chunker import chunk_text
+from services.embedding_search import embed_and_store_chunks
 
 router = APIRouter()
 
