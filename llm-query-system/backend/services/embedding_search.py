@@ -18,12 +18,19 @@ def search_similar_chunks(query: str, documents: list[str], top_k: int = 5) -> l
 
     return [(documents[i], float(scores[i])) for i in top_indices]
 
-def embed_and_store_chunks(chunks: list[str], output_path: str) -> None:
+import json
+
+def embed_and_store_chunks(chunks: list[str], output_path: str, metadata: dict = None) -> None:
     embeddings = embed_texts(chunks)
     data = [
-        {"chunk": chunk, "embedding": emb.tolist()}
+        {
+            "chunk": chunk,
+            "embedding": emb.tolist(),
+            "metadata": metadata
+        }
         for chunk, emb in zip(chunks, embeddings)
     ]
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
+
 
