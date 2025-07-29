@@ -58,7 +58,7 @@ Document uploads are scanned for malware
 Sensitive data is encrypted at rest
 Rate limiting implemented for API endpoints
 
-# # 🏆 Team Bots101
+# 🏆 Team Bots101
 From Vellore Institute of Technology (VIT)
 1. Harshit Arora - Team Lead
 2. Sameer Chaudhary - Developer
