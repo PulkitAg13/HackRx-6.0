@@ -42,7 +42,9 @@ async def upload_documents(files: List[UploadFile] = File(...)):
         os.remove(tmp_path)
 
         chunks = chunk_text(text)
-        embed_and_store_chunks(chunks, metadata={"source": filename})
+        output_path = f"vector_store/{filename}.json"
+        embed_and_store_chunks(chunks, output_path)
+
 
         results.append({
             "filename": filename,
