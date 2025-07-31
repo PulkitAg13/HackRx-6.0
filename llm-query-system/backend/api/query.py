@@ -13,32 +13,32 @@ router = APIRouter()
 
 class QueryRequest(BaseModel):
     query: str
+    file_id: str
+
 
 @router.post("/")
 async def query_documents(request: QueryRequest):
     query = request.query.strip()
+    file_id = request.file_id.strip()
 
-    if not query:
-        raise HTTPException(status_code=400, detail="Query cannot be empty.")
+    if not query or not file_id:
+        raise HTTPException(status_code=400, detail="Query and file_id are required.")
 
     try:
-        # 🔹 Load embedded chunks from JSON file (use the same file created during upload)
-        vector_store_path = "vector_store/embedded_data.json"
+        vector_store_path = f"vector_store/{file_id}_embedded.json"
         if not os.path.exists(vector_store_path):
-            raise HTTPException(status_code=404, detail="No embedded document found. Please upload first.")
+            raise HTTPException(status_code=404, detail="Embedded data not found for this file.")
 
         with open(vector_store_path, "r", encoding="utf-8") as f:
             embedded_data = json.load(f)
 
         documents = [item["chunk"] for item in embedded_data]
 
-        # 🔹 Step 1: Search similar chunks
         relevant_chunks = search_similar_chunks(query, documents, top_k=5)
 
         if not relevant_chunks:
             return JSONResponse(content={"answer": "No relevant information found."})
 
-        # 🔹 Step 2: Generate answer using LLM
         answer = generate_answer(query, relevant_chunks)
 
         return JSONResponse(content={"answer": answer, "context": relevant_chunks})

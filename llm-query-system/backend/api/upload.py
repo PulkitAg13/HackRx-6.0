@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from typing import List
 import os
 import tempfile
+import uuid
 
 from doc_processor.pdf_extractor import extract_text_from_pdf
 from doc_processor.docx_extractor import extract_text_from_docx
@@ -42,12 +43,16 @@ async def upload_documents(files: List[UploadFile] = File(...)):
         os.remove(tmp_path)
 
         chunks = chunk_text(text)
-        output_path = f"vector_store/{filename}.json"
-        embed_and_store_chunks(chunks, output_path)
 
+        # 🔹 Generate a unique ID for this file
+        file_id = str(uuid.uuid4())
+        output_path = f"vector_store/{file_id}_embedded.json"
+
+        embed_and_store_chunks(chunks, output_path)
 
         results.append({
             "filename": filename,
+            "file_id": file_id,
             "chunks_uploaded": len(chunks)
         })
 
