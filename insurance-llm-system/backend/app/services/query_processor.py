@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 from sqlalchemy.orm import Session
 from ..db import crud
 from ml_models.llm_integration.model_selector import get_llm_response
