@@ -25,7 +25,7 @@ class Clause(Base):
     clause_text = Column(String, nullable=False)
     section = Column(String)
     page_number = Column(Integer)
-    embeddings = Column(JSON)  # Store vector embeddings
+    embeddings = Column(JSON)
     
     document = relationship("Document", back_populates="clauses")
 
