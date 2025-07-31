@@ -1,7 +1,7 @@
 import logging
 from transformers import Trainer, TrainingArguments
 from datasets import Dataset
-from ....backend.config import settings
+from ....backend.app.core.config import settings
 from typing import Dict, Any
 
 logger = logging.getLogger(__name__)

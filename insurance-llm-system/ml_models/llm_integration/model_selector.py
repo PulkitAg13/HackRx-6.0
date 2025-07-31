@@ -1,7 +1,7 @@
 from typing import Union, Dict, Any
 from .openai_integration import get_llm_response as get_openai_response
 from .llama_integration import get_llm_response as get_llama_response
-from ...backend.config import settings
+from ...backend.app.core.config import settings
 
 def get_llm_response(
     prompt: str,

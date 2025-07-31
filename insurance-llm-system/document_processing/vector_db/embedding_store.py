@@ -1,6 +1,6 @@
 import logging
 from typing import List, Dict, Optional
-from ...backend.config import settings
+from ...backend.app.core.config import settings
 from .pinecone_integration import initialize_pinecone
 from .chroma_integration import initialize_chroma
 

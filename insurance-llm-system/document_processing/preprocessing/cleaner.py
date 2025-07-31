@@ -1,7 +1,7 @@
 import logging
 import re
 from typing import Optional
-from ...backend.config import settings
+from ...backend.app.core.config import settings
 
 logger = logging.getLogger(__name__)
 

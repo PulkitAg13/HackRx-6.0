@@ -2,7 +2,7 @@ import logging
 import pdfplumber
 from io import BytesIO
 from typing import Dict, Optional
-from ...backend.config import settings
+from ...backend.app.core.config import settings
 
 logger = logging.getLogger(__name__)
 

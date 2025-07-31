@@ -1,6 +1,6 @@
 import logging
 from sentence_transformers import SentenceTransformer
-from ...backend.config import settings
+from ...backend.app.core.config import settings
 from typing import List, Union
 import numpy as np
 

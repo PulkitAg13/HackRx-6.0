@@ -1,7 +1,7 @@
 import logging
 import pinecone
 from typing import List, Dict, Optional
-from ...backend.config import settings
+from ...backend.app.core.config import settings
 from ...ml_models.embedding_models import get_embeddings
 
 logger = logging.getLogger(__name__)

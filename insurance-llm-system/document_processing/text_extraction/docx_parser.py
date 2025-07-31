@@ -3,7 +3,7 @@ from docx import Document
 from io import BytesIO
 from typing import Dict, List
 import xml.etree.ElementTree as ET
-from ...backend.config import settings
+from ...backend.app.core.config import settings
 
 logger = logging.getLogger(__name__)
 

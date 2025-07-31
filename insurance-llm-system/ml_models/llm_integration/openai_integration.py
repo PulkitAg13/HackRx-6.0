@@ -1,7 +1,7 @@
 import openai
 import logging
 from typing import Union, Dict, Any
-from ...backend.config import settings
+from ...backend.app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
