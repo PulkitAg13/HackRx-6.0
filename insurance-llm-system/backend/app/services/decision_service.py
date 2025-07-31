@@ -1,50 +1,45 @@
 import logging
-from typing import List, Dict, Optional
+from typing import Dict, List
 from sqlalchemy.orm import Session
-from ..db import crud
-from ....ml_models.llm_integration.openai_integration import get_llm_response  # Changed from models.llm_integration
 from ..api.v1.schemas import ProcessResponse
+from ml_models.llm_integration.model_selector import get_llm_response
 
 logger = logging.getLogger(__name__)
 
 def make_decision_from_clauses(
-    db: Session,
     query_analysis: Dict,
-    relevant_clauses: List[Dict],
-    document_id: int
-) -> ProcessResponse:
+    relevant_clauses: List[Dict]
+) -> Dict:
     """
     Make final insurance decision based on analyzed query and relevant clauses.
     Handles the complete decision logic and justification generation.
     """
     try:
-        # Step 1: Validate input data
+        # Validate input data
         if not relevant_clauses:
             raise ValueError("No relevant clauses provided for decision making")
         
-        # Step 2: Generate decision prompt
+        # Generate decision prompt
         decision_prompt = build_decision_prompt(query_analysis, relevant_clauses)
         
-        # Step 3: Get LLM decision
+        # Get LLM decision
         decision_result = get_structured_decision(decision_prompt)
         
-        # Step 4: Validate and format response
+        # Validate and format response
         validated_decision = validate_decision(decision_result)
         
-        return ProcessResponse(
-            decision=validated_decision["decision"],
-            amount=validated_decision.get("amount"),
-            currency=validated_decision.get("currency", "INR"),
-            justification=validated_decision["justification"],
-            confidence_score=validated_decision.get("confidence_score", 0.0)
-        )
-        
+        return validated_decision
     except Exception as e:
         logger.error(f"Decision making failed: {str(e)}")
         raise
 
 def build_decision_prompt(query_analysis: Dict, relevant_clauses: List[Dict]) -> str:
     """Construct the decision prompt for the LLM"""
+    clauses_text = "\n".join(
+        f"Clause {i+1}:\n{clause['text']}\n(Section: {clause.get('section', 'N/A')})"
+        for i, clause in enumerate(relevant_clauses)
+    )
+    
     return f"""
     As an insurance claim adjudicator, analyze this claim based on the policy clauses:
     
@@ -56,7 +51,7 @@ def build_decision_prompt(query_analysis: Dict, relevant_clauses: List[Dict]) ->
     - Policy Duration: {query_analysis.get('policy_duration_months', 'N/A')} months
     
     Relevant Policy Clauses:
-    {format_clauses_for_prompt(relevant_clauses)}
+    {clauses_text}
     
     Provide your decision in this JSON format:
     {{
@@ -71,13 +66,6 @@ def build_decision_prompt(query_analysis: Dict, relevant_clauses: List[Dict]) ->
         "confidence_score": 0.0-1.0
     }}
     """
-
-def format_clauses_for_prompt(clauses: List[Dict]) -> str:
-    """Format clauses for the decision prompt"""
-    return "\n".join(
-        f"Clause {idx+1} (Section {clause.get('section', 'N/A')}): {clause['text']}"
-        for idx, clause in enumerate(clauses)
-    )
 
 def get_structured_decision(prompt: str) -> Dict:
     """Get structured decision from LLM with validation"""
