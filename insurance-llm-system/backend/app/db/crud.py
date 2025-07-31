@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from . import models
-from typing import Optional, List
+from typing import Optional, List, Dict
 import uuid
 
 def create_document(db: Session, filename: str, file_type: str, file_size: int, metadata: dict = None):
@@ -21,12 +21,13 @@ def get_document(db: Session, document_id: int):
 def get_documents(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Document).offset(skip).limit(limit).all()
 
-def create_clause(db: Session, document_id: int, clause_text: str, section: str = None, page_number: int = None):
+def create_clause(db: Session, document_id: int, clause_text: str, section: str = None, page_number: int = None, embeddings: list = None):
     db_clause = models.Clause(
         document_id=document_id,
         clause_text=clause_text,
         section=section,
-        page_number=page_number
+        page_number=page_number,
+        embeddings=embeddings
     )
     db.add(db_clause)
     db.commit()
