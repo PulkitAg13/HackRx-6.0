@@ -1,6 +1,7 @@
 import hashlib
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
+import re
 
 def generate_unique_id():
     """Generate a unique ID based on current timestamp"""
@@ -26,3 +27,8 @@ def format_currency(amount: Optional[float], currency: str = "INR") -> str:
     
     symbol = currency_symbols.get(currency, currency)
     return f"{symbol}{amount:,.2f}"
+
+def extract_numbers(text: str) -> List[float]:
+    """Extract all numbers from text"""
+    numbers = re.findall(r"\d+\.?\d*", text)
+    return [float(num) for num in numbers]
