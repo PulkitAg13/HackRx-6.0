@@ -9,22 +9,27 @@ from ...services.query_processor import process_insurance_query
 from ...services.document_service import process_uploaded_document
 from .schemas import (
     Query, QueryCreate, Decision, Document, DocumentCreate, Clause,
-    ProcessResponse
+    ProcessResponse, DocumentUploadResponse
 )
 from ...core.security import get_api_key
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-@router.post("/documents/", response_model=Document, tags=["documents"])
+@router.post("/documents/", response_model=DocumentUploadResponse, tags=["documents"])
 async def upload_document(
     file: UploadFile = File(...),
     db: Session = Depends(session.get_db),
     api_key: str = Depends(get_api_key)
 ):
     try:
-        document = await process_uploaded_document(db, file)
-        return document
+        result = await process_uploaded_document(db, file)
+        return DocumentUploadResponse(
+            document_id=result["document_id"],
+            filename=result["filename"],
+            processed=result["processed"],
+            clauses_processed=result["clauses_processed"]
+        )
     except ValueError as e:
         logger.error(f"Document upload error: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
@@ -66,7 +71,7 @@ def process_query(
             justification=result.justification
         )
         
-        response = ProcessResponse(
+        return ProcessResponse(
             decision=result.decision,
             amount=result.amount,
             currency=result.currency,
@@ -74,8 +79,6 @@ def process_query(
             confidence_score=result.confidence_score,
             query_id=db_query.id
         )
-        
-        return response
     except Exception as e:
         logger.error(f"Query processing error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
