@@ -1,0 +1,18 @@
+# Database configuration
+database:
+  main:
+    url: "postgresql://user:password@localhost:5432/insurance_db"
+    pool_size: 20
+    max_overflow: 30
+    echo: false
+  
+  test:
+    url: "postgresql://user:password@localhost:5432/insurance_test_db"
+    pool_size: 5
+    max_overflow: 10
+    echo: false
+
+migrations:
+  alembic_ini: "./alembic.ini"
+  migrations_dir: "./migrations"
+  version_locations: ["migrations/versions"]

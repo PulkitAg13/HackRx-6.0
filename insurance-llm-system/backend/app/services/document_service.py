@@ -8,7 +8,7 @@ from ..core.config import settings
 from ....document_processing.text_extraction import extract_text
 from ....document_processing.preprocessing import clean_text, chunk_text
 from ....document_processing.vector_db import initialize_vector_db, store_clauses
-from ....ml_models.embedding_models import get_embeddings
+from ....ml_models.embedding_models.ada_embeddings import get_embeddings
 
 logger = logging.getLogger(__name__)
 

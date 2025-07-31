@@ -1,0 +1,21 @@
+Analyze this insurance query and extract structured information:
+
+Query: "{query}"
+
+Extract as JSON with these fields:
+- age: number|null
+- gender: string (M/F/Other)|null
+- procedure: string|null
+- location: string|null
+- policy_duration_months: number|null
+- other_details: object|null
+
+Example Output:
+{
+    "age": 45,
+    "gender": "M",
+    "procedure": "knee surgery",
+    "location": "Pune",
+    "policy_duration_months": 3,
+    "other_details": {}
+}

@@ -1,0 +1,15 @@
+Explain the insurance claim decision in clear, simple language for the policyholder:
+
+Decision: {decision}
+Amount: {amount} {currency}
+
+Policy Clauses Considered:
+{clauses}
+
+Write a 2-3 paragraph explanation that:
+1. States the decision clearly
+2. References specific policy clauses
+3. Explains any limitations or requirements
+4. Provides next steps if applicable
+
+Tone should be professional but empathetic.

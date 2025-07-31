@@ -1,0 +1,22 @@
+Identify the most relevant insurance policy clauses for this claim:
+
+Claim Details:
+- Age: {age}
+- Gender: {gender}
+- Procedure: {procedure}
+- Location: {location}
+- Policy Duration: {policy_duration} months
+
+Policy Document:
+{policy_text}
+
+Return the top 3 most relevant clauses as JSON:
+{
+    "clauses": [
+        {
+            "text": "full clause text",
+            "section": "section identifier",
+            "relevance_score": 0.0-1.0
+        }
+    ]
+}

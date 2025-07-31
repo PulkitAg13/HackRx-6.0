@@ -1,0 +1,24 @@
+As an insurance claim adjudicator, analyze this claim based on the policy clauses:
+
+Claim Details:
+- Age: {age}
+- Gender: {gender}
+- Procedure: {procedure}
+- Location: {location}
+- Policy Duration: {policy_duration} months
+
+Relevant Policy Clauses:
+{clauses}
+
+Provide your decision in this JSON format:
+{
+    "decision": "approved|denied|pending",
+    "amount": number|null,
+    "currency": "INR",
+    "justification": {
+        "coverage": "Which clause covers this?",
+        "limitations": "Any limitations that apply",
+        "requirements": "Requirements met/missing"
+    },
+    "confidence_score": 0.0-1.0
+}

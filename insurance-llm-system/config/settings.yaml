@@ -1,0 +1,28 @@
+# Main application settings
+app:
+  env: "development"  # or "production"
+  debug: true
+  api_key: "your_secret_api_key"
+  cors_origins: "*"  # Comma-separated list of allowed origins
+  max_file_size_mb: 10
+  allowed_file_types: ["pdf", "docx", "txt", "eml"]
+
+document_processing:
+  pdf_max_pages: 100
+  chunk_size: 1000
+  chunk_overlap: 200
+  cleaner:
+    lowercase: true
+    remove_special_chars: true
+    remove_stopwords: false
+    stopwords: ["the", "and", "or"]
+
+vector_db:
+  type: "pinecone"  # or "chroma"
+  pinecone:
+    api_key: "your_pinecone_key"
+    environment: "us-west1-gcp"
+    index_name: "insurance-docs"
+  chroma:
+    collection_name: "insurance-clauses"
+    persist_dir: "./chroma_db"

@@ -2,7 +2,7 @@ import logging
 from typing import List, Dict, Optional
 from sqlalchemy.orm import Session
 from ..db import crud
-from ....ml_models.llm_integration import get_llm_response  # Changed from models.llm_integration
+from ....ml_models.llm_integration.openai_integration import get_llm_response  # Changed from models.llm_integration
 from ..api.v1.schemas import ProcessResponse
 
 logger = logging.getLogger(__name__)
