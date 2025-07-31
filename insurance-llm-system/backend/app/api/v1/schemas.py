@@ -73,3 +73,9 @@ class ProcessResponse(BaseModel):
     justification: Dict[str, Any]
     confidence_score: Optional[float]
     query_id: int
+
+class DocumentUploadResponse(BaseModel):
+    document_id: int
+    filename: str
+    processed: bool
+    clauses_processed: int
