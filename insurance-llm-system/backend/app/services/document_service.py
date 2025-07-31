@@ -11,8 +11,8 @@ from document_processing.text_extraction import (
 from document_processing.preprocessing import (
     clean_text, chunk_text, detect_sections
 )
-from ml_models.embedding_models.model_selector import get_embeddings
-from ml_models.vector_db.vector_db_selector import get_vector_store
+from ml_models.embedding_models.ada_embeddings import get_embeddings  # or ada_embeddings
+from document_processing.vector_db.pinecone_integration import get_vector_store  # or chroma_integration
 
 logger = logging.getLogger(__name__)
 
