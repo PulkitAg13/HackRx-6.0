@@ -1,27 +1,34 @@
 import os
 import logging
-from typing import Optional
+from typing import Dict, List, Optional
 from sqlalchemy.orm import Session
-from datetime import datetime
+from io import BytesIO
 from ..db import crud
 from ..core.config import settings
-from ....document_processing.text_extraction import extract_text
-from ....document_processing.preprocessing import clean_text, chunk_text
-from ....document_processing.vector_db import initialize_vector_db, store_clauses
-from ....ml_models.embedding_models.ada_embeddings import get_embeddings
+from document_processing.text_extraction import (
+    parse_pdf, parse_docx, parse_email
+)
+from document_processing.preprocessing import (
+    clean_text, chunk_text, detect_sections
+)
+from ml_models.embedding_models.model_selector import get_embeddings
+from ml_models.vector_db.vector_db_selector import get_vector_store
 
 logger = logging.getLogger(__name__)
 
+vector_store = None
+
 async def initialize_document_service():
     """Initialize document processing services"""
+    global vector_store
     try:
-        await initialize_vector_db()
+        vector_store = get_vector_store()
         logger.info("Document service initialized successfully")
     except Exception as e:
         logger.error(f"Failed to initialize document service: {str(e)}")
         raise
 
-async def process_uploaded_document(db: Session, file) -> dict:
+async def process_uploaded_document(db: Session, file) -> Dict:
     """Process an uploaded document through the full pipeline"""
     try:
         # Validate file
@@ -31,22 +38,30 @@ async def process_uploaded_document(db: Session, file) -> dict:
         document = save_document_metadata(db, file)
         
         # Extract text from document
-        text = extract_text(file.file, file.filename)
+        text = await extract_text_from_file(file)
         
         # Clean and chunk text
         cleaned_text = clean_text(text)
-        chunks = chunk_text(cleaned_text)
+        sections = detect_sections(cleaned_text)
         
-        # Process each chunk (section/clause)
+        # Process each section
         clauses = []
-        for i, chunk in enumerate(chunks):
-            clause = process_text_chunk(db, document.id, chunk, i)
-            clauses.append(clause)
+        for section_type, section_data in sections.items():
+            for section in section_data:
+                section_clauses = process_section(
+                    db, document.id, section["text"], section["title"]
+                )
+                clauses.extend(section_clauses)
         
         # Update document as processed
         update_document_processed(db, document.id)
         
-        return document
+        return {
+            "document_id": document.id,
+            "filename": document.filename,
+            "processed": True,
+            "clauses_processed": len(clauses)
+        }
     except Exception as e:
         logger.error(f"Error processing document: {str(e)}")
         raise
@@ -63,13 +78,30 @@ def validate_file(file):
         raise ValueError(f"File size exceeds maximum of {settings.MAX_DOCUMENT_SIZE_MB}MB")
     
     # Check file type
-    file_ext = file.filename.split('.')[-1].lower()
+    file_ext = os.path.splitext(file.filename)[1][1:].lower()
     if file_ext not in settings.ALLOWED_FILE_TYPES:
         raise ValueError(f"Unsupported file type: {file_ext}")
 
-def save_document_metadata(db: Session, file) -> dict:
+async def extract_text_from_file(file):
+    """Extract text based on file type"""
+    file_ext = os.path.splitext(file.filename)[1][1:].lower()
+    file_content = await file.read()
+    file_stream = BytesIO(file_content)
+    
+    if file_ext == "pdf":
+        result = parse_pdf(file_stream)
+    elif file_ext == "docx":
+        result = parse_docx(file_stream)
+    elif file_ext in ["eml", "email"]:
+        result = parse_email(file_stream)
+    else:
+        raise ValueError(f"Unsupported file type: {file_ext}")
+    
+    return result["text"]
+
+def save_document_metadata(db: Session, file):
     """Save document metadata to database"""
-    file_ext = file.filename.split('.')[-1].lower()
+    file_ext = os.path.splitext(file.filename)[1][1:].lower()
     file.file.seek(0, 2)  # Seek to end
     file_size = file.file.tell()
     file.file.seek(0)  # Reset pointer
@@ -82,33 +114,51 @@ def save_document_metadata(db: Session, file) -> dict:
     )
     return document
 
-def process_text_chunk(db: Session, document_id: int, text: str, chunk_index: int) -> dict:
-    """Process a single text chunk into a clause"""
-    # Get embeddings for the chunk
-    embeddings = get_embeddings(text)
+def process_section(db: Session, document_id: int, text: str, section_title: str) -> List[Dict]:
+    """Process a document section into clauses"""
+    chunks = chunk_text(text)
+    clauses = []
     
-    # Create clause in database
-    clause = crud.create_clause(
-        db,
-        document_id=document_id,
-        clause_text=text,
-        section=f"Section {chunk_index + 1}"
-    )
-    
-    # Store embeddings in vector DB
-    store_clauses([{
-        "id": clause.id,
-        "text": text,
-        "embeddings": embeddings,
-        "document_id": document_id
-    }])
-    
-    return clause
+    for i, chunk in enumerate(chunks):
+        if not chunk.strip():
+            continue
+            
+        try:
+            # Get embeddings for the chunk
+            embeddings = get_embeddings(chunk)
+            
+            # Create clause in database
+            clause = crud.create_clause(
+                db,
+                document_id=document_id,
+                clause_text=chunk,
+                section=f"{section_title}_{i+1}",
+                embeddings=embeddings
+            )
+            
+            # Store in vector DB
+            vector_store.upsert_clauses([{
+                "id": clause.id,
+                "document_id": document_id,
+                "text": chunk,
+                "section": f"{section_title}_{i+1}",
+                "embeddings": embeddings
+            }])
+            
+            clauses.append({
+                "id": clause.id,
+                "section": clause.section
+            })
+        except Exception as e:
+            logger.error(f"Error processing section chunk: {str(e)}")
+            continue
+            
+    return clauses
 
 def update_document_processed(db: Session, document_id: int):
     """Mark document as processed in database"""
     document = crud.get_document(db, document_id)
-    if document:
+    if document and not document.processed:
         document.processed = True
         db.commit()
         db.refresh(document)
