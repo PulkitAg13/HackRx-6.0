@@ -1,4 +1,5 @@
-from pydantic import BaseSettings, AnyUrl, validator
+from pydantic_settings import BaseSettings
+from pydantic import AnyUrl, validator
 from typing import List, Optional
 import os
 from pathlib import Path
