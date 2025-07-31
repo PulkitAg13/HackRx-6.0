@@ -3,8 +3,8 @@ from typing import Dict, Optional
 from sqlalchemy.orm import Session
 from ..db import crud
 from ml_models.llm_integration.model_selector import get_llm_response
-from ml_models.embedding_models.model_selector import get_embeddings
-from ml_models.vector_db.vector_db_selector import search_clauses
+from ml_models.embedding_models.ada_embeddings import get_embeddings
+from document_processing.vector_db.pinecone_integration import search_clauses
 from ..api.v1.schemas import ProcessResponse
 
 logger = logging.getLogger(__name__)
