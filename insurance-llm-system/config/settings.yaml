@@ -26,3 +26,7 @@ vector_db:
   chroma:
     collection_name: "insurance-clauses"
     persist_dir: "./chroma_db"
+
+database:
+  pool_size: 5
+  max_overflow: 10
