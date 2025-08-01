@@ -5,6 +5,7 @@ from typing import List
 import logging
 
 from ...db import crud, models, session
+from ...db.session import get_db
 from ...services.query_processor import process_insurance_query
 from ...services.document_service import process_uploaded_document
 from .schemas import (
@@ -19,8 +20,8 @@ logger = logging.getLogger(__name__)
 @router.post("/documents/", response_model=DocumentUploadResponse, tags=["documents"])
 async def upload_document(
     file: UploadFile = File(...),
-    db: Session = Depends(session.get_db),
-    api_key: str = Depends(get_api_key)
+    db: Session = Depends(get_db)
+
 ):
     try:
         result = await process_uploaded_document(db, file)
@@ -41,8 +42,8 @@ async def upload_document(
 def read_documents(
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(session.get_db),
-    api_key: str = Depends(get_api_key)
+    db: Session = Depends(get_db)
+
 ):
     documents = crud.get_documents(db, skip=skip, limit=limit)
     return documents
@@ -50,8 +51,8 @@ def read_documents(
 @router.post("/process/", response_model=ProcessResponse, tags=["queries"])
 def process_query(
     query: QueryCreate,
-    db: Session = Depends(session.get_db),
-    api_key: str = Depends(get_api_key)
+    db: Session = Depends(get_db)
+
 ):
     try:
         # Store the raw query first
@@ -86,8 +87,8 @@ def process_query(
 @router.get("/decisions/{query_id}", response_model=Decision, tags=["decisions"])
 def read_decision(
     query_id: int,
-    db: Session = Depends(session.get_db),
-    api_key: str = Depends(get_api_key)
+    db: Session = Depends(get_db)
+
 ):
     decision = db.query(models.Decision).filter(models.Decision.query_id == query_id).first()
     if not decision:
