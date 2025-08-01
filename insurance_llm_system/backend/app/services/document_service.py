@@ -73,14 +73,17 @@ def validate_file(file):
     file.file.seek(0, 2)  # Seek to end
     file_size = file.file.tell()
     file.file.seek(0)  # Reset pointer
-    
+
     if file_size > max_size:
         raise ValueError(f"File size exceeds maximum of {settings.MAX_DOCUMENT_SIZE_MB}MB")
-    
-    # Check file type
+
+    # Check file extension
     file_ext = os.path.splitext(file.filename)[1][1:].lower()
-    if file_ext not in settings.ALLOWED_FILE_TYPES:
+    allowed_types = [ext.strip() for ext in settings.ALLOWED_FILE_TYPES.split(",")]
+    print(f"Uploaded file extension: {file_ext}, Allowed: {allowed_types}")
+    if file_ext not in allowed_types:
         raise ValueError(f"Unsupported file type: {file_ext}")
+
 
 async def extract_text_from_file(file):
     """Extract text based on file type"""
