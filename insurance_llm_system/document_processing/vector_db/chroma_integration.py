@@ -2,7 +2,7 @@ import logging
 import chromadb
 from typing import List, Dict
 from backend.app.core.config import settings
-from ml_models.embedding_models import get_embeddings
+from ml_models.embedding_models.ada_embeddings import get_embeddings
 
 logger = logging.getLogger(__name__)
 

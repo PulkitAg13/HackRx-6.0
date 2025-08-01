@@ -40,3 +40,9 @@ app.add_middleware(
 
 # Include API routers
 app.include_router(api_router, prefix="/api/v1")
+
+@app.on_event("startup")
+def startup_event():
+    from backend.app.db.session import init_db
+    init_db()
+    logger.info("Database tables created")

@@ -6,10 +6,10 @@ from io import BytesIO
 from ..db import crud
 from ..core.config import settings
 from document_processing.text_extraction import (
-    parse_pdf, parse_docx, parse_email
+    pdf_parser, docx_parser, email_parser
 )
 from document_processing.preprocessing import (
-    clean_text, chunk_text, detect_sections
+    cleaner, chunker, section_detector
 )
 from ml_models.embedding_models.ada_embeddings import get_embeddings  # or ada_embeddings
 from document_processing.vector_db.pinecone_integration import get_vector_store  # or chroma_integration
@@ -41,8 +41,8 @@ async def process_uploaded_document(db: Session, file) -> Dict:
         text = await extract_text_from_file(file)
         
         # Clean and chunk text
-        cleaned_text = clean_text(text)
-        sections = detect_sections(cleaned_text)
+        cleaned_text = cleaner(text)
+        sections = section_detector(cleaned_text)
         
         # Process each section
         clauses = []
@@ -89,11 +89,11 @@ async def extract_text_from_file(file):
     file_stream = BytesIO(file_content)
     
     if file_ext == "pdf":
-        result = parse_pdf(file_stream)
+        result = pdf_parser(file_stream)
     elif file_ext == "docx":
-        result = parse_docx(file_stream)
+        result = docx_parser(file_stream)
     elif file_ext in ["eml", "email"]:
-        result = parse_email(file_stream)
+        result = email_parser(file_stream)
     else:
         raise ValueError(f"Unsupported file type: {file_ext}")
     
@@ -116,7 +116,7 @@ def save_document_metadata(db: Session, file):
 
 def process_section(db: Session, document_id: int, text: str, section_title: str) -> List[Dict]:
     """Process a document section into clauses"""
-    chunks = chunk_text(text)
+    chunks = chunker(text)
     clauses = []
     
     for i, chunk in enumerate(chunks):
