@@ -43,7 +43,11 @@ class Settings(BaseSettings):
     )
 
     PDF_MAX_PAGES: int = 20
-    CLEANER_CONFIG: str = "default"
+    PDF_MAX_SIZE_MB: int = 10
+    CLEANER_CONFIG: dict[str, str] = {
+        "remove_headers": "true",
+        "normalize_spacing": "true"
+    }
 
     # Database Configuration
     DB_URL: str = Field(
