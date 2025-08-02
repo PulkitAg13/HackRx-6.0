@@ -42,6 +42,9 @@ class Settings(BaseSettings):
         description="Character overlap between chunks"
     )
 
+    PDF_MAX_PAGES: int = 20
+    CLEANER_CONFIG: str = "default"
+
     # Database Configuration
     DB_URL: str = Field(
         default="sqlite:///./insurance.db",

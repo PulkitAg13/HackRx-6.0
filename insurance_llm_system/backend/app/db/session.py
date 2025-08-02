@@ -55,7 +55,6 @@ def init_db():
         logger.error(f"Failed to create database tables: {str(e)}")
         raise
 
-@contextmanager
 def get_db() -> Generator[scoped_session, None, None]:
     """Database session dependency with proper cleanup"""
     db = ScopedSession()
@@ -82,7 +81,6 @@ if settings.TEST_DB_URL:
     )
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 
-    @contextmanager
     def get_test_db() -> Generator[scoped_session, None, None]:
         """Test database session with automatic cleanup"""
         db = TestingSessionLocal()
