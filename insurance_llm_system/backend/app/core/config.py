@@ -91,7 +91,7 @@ class Settings(BaseSettings):
         description="OpenAI API key"
     )
     OPENAI_MODEL: str = Field(
-        default="gpt-4-1106-preview",
+        default="gpt-3.5-turbo",
         description="OpenAI model name"
     )
     LLAMA_MODEL_PATH: str = Field(
